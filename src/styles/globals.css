@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body {
+  min-height: 100%;
+  background-color: theme('colors.gray.50');
+  color: theme('colors.gray.900');
+  font-family: theme('fontFamily.sans');
+} 
