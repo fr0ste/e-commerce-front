@@ -42,7 +42,7 @@ jobs:
     - name: Build and push Frontend image
       uses: docker/build-push-action@v5
       with:
-        context: ./frontend
+        context: .
         push: true
         tags: ${{ env.FRONTEND_IMAGE }}:${{ steps.meta.outputs.version }}
         labels: ${{ steps.meta.outputs.labels }}
