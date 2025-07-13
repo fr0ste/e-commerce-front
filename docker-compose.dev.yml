@@ -1,41 +1,6 @@
 version: '3.8'
 
 services:
-  # PostgreSQL Database
-  postgres:
-    image: postgres:15-alpine
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: ecommerce_dev
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - '5432:5432'
-    volumes:
-      - postgres_dev_data:/var/lib/postgresql/data
-    networks:
-      - app-network
-
-  # Backend API (Development)
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    command: npm run start:dev
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
-    ports:
-      - '3000:3000'
-    environment:
-      - NODE_ENV=development
-      - DATABASE_URL=postgres://postgres:postgres@postgres:5432/ecommerce_dev
-      - JWT_SECRET=dev-secret-key
-      - PORT=3000
-    depends_on:
-      - postgres
-    networks:
-      - app-network
 
   # Frontend Application (Development)
   frontend:

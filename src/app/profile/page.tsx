@@ -1,5 +1,8 @@
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 
+// Evitar prerender ya que esta página verifica autenticación
+export const dynamic = 'force-dynamic';
+
 export default function ProfilePage() {
   return (
     <ProtectedRoute>
