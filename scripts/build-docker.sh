@@ -56,15 +56,11 @@ print_status "Cleaning up previous build artifacts..."
 rm -rf .next
 rm -rf node_modules/.cache
 
-# Build the Docker image
+# Build the Docker image (compatible with legacy builder)
 print_status "Building Docker image..."
 print_status "Image: $IMAGE_NAME:$TAG"
 
-# Build with detailed output and error handling
 if docker build \
-    --progress=plain \
-    --no-cache \
-    --build-arg BUILDKIT_INLINE_CACHE=1 \
     -t "$IMAGE_NAME:$TAG" \
     -t "$IMAGE_NAME:latest" \
     -f "$DOCKERFILE" \
