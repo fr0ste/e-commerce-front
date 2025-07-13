@@ -1,3 +1,6 @@
+// Evitar prerender ya que esta página usa datos del usuario
+export const dynamic = 'force-dynamic';
+
 export default function OrdersPage() {
   return (
     <main className="container mx-auto py-10 max-w-2xl">
