@@ -43,17 +43,33 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         context: .
+        file: ./Dockerfile
         push: true
         tags: ${{ env.FRONTEND_IMAGE }}:${{ steps.meta.outputs.version }}
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
+        build-args: |
+          BUILDKIT_INLINE_CACHE=1
 
     - name: Push latest tags
       if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
       run: |
         docker tag ${{ env.FRONTEND_IMAGE }}:${{ steps.meta.outputs.version }} ${{ env.FRONTEND_IMAGE }}:latest
         docker push ${{ env.FRONTEND_IMAGE }}:latest
+
+    - name: Test built image
+      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+      run: |
+        echo "🧪 Testing built image..."
+        docker run --rm -d --name test-frontend -p 3000:3000 ${{ env.FRONTEND_IMAGE }}:${{ steps.meta.outputs.version }}
+        sleep 10
+        if curl -f http://localhost:3000 > /dev/null 2>&1; then
+          echo "✅ Image test successful!"
+        else
+          echo "⚠️  Image test failed - container might not be responding"
+        fi
+        docker stop test-frontend || true
 
     - name: Notify deployment
       if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'

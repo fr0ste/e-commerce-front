@@ -38,12 +38,13 @@ npm install
 
 3. Configura las variables de entorno:
 ```bash
-cp .env.example .env.local
+cp env.example.local .env.local
 ```
 
 Edita `.env.local`:
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:3000
+NEXT_PUBLIC_FRONTEND_URL=http://localhost:3002
 ```
 
 4. Ejecuta el servidor de desarrollo:
@@ -51,7 +52,13 @@ NEXT_PUBLIC_API_URL=http://localhost:3000
 npm run dev
 ```
 
-5. Abre [http://localhost:3000](http://localhost:3000) en tu navegador.
+5. Abre [http://localhost:3002](http://localhost:3002) en tu navegador.
+
+## Configuración de Puertos
+
+- **Frontend**: `http://localhost:3002`
+- **Backend**: `http://localhost:3000`
+- **Base de datos**: `localhost:5432`
 
 ## Estructura del Proyecto
 
@@ -107,11 +114,13 @@ El frontend está configurado para consumir una API NestJS en el puerto 3000:
 
 ## Scripts Disponibles
 
-- `npm run dev` - Servidor de desarrollo
+- `npm run dev` - Servidor de desarrollo (puerto 3002)
 - `npm run build` - Construir para producción
 - `npm run start` - Servidor de producción
 - `npm run lint` - Ejecutar ESLint
 - `npm run type-check` - Verificar tipos TypeScript
+- `npm run check-backend` - Verificar conectividad con el backend
+- `npm run dev:check` - Verificar backend y iniciar desarrollo
 
 ## Características de Seguridad
 

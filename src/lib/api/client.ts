@@ -1,14 +1,13 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+import { config } from '@/lib/config';
 
 export const apiClient = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: config.api.baseURL,
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 10000,
+  timeout: config.api.timeout,
 });
 
 // Request interceptor to add auth token
@@ -31,13 +30,28 @@ apiClient.interceptors.response.use(
     return response;
   },
   (error) => {
+    // Solo manejar errores de autenticación, no errores de red o servidor
     if (error.response?.status === 401) {
-      // Clear token and redirect to login
+      // Clear token and redirect to login only if we're not already on auth pages
       Cookies.remove('token');
-      if (typeof window !== 'undefined') {
+      if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/auth/')) {
         window.location.href = '/auth/login';
       }
     }
+    
+    // Para errores 404, no hacer nada especial - dejar que cada componente maneje
+    // No redirigir automáticamente para evitar loops
+    
+    // Log error en modo debug
+    if (config.debug) {
+      console.warn('API Error:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status: error.response?.status,
+        message: error.message,
+      });
+    }
+    
     return Promise.reject(error);
   }
 );

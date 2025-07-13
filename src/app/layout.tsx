@@ -4,6 +4,7 @@ import Providers from './_components/Providers';
 import AuthInit from './_components/AuthInit';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
+import ConnectionStatus from '@/components/feedback/ConnectionStatus';
 
 // Este layout es un Server Component, pero usa Providers, AuthInit, Navbar y Footer como Client Components
 export default function RootLayout({ children }: { children: ReactNode }) {
@@ -14,6 +15,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <Providers>
           <AuthInit />
           <Navbar />
+          <ConnectionStatus className="mx-4 mt-4" />
           <div className="flex-1 flex flex-col">
             {children}
           </div>

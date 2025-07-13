@@ -3,11 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3002",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "check-backend": "node scripts/check-backend.js",
+    "dev:check": "npm run check-backend && npm run dev",
+    "debug": "NODE_ENV=development DEBUG=* npm run dev",
+    "docker:build": "./scripts/build-docker.sh",
+    "docker:build:tag": "./scripts/build-docker.sh",
+    "docker:test": "docker run --rm -p 3000:3000 fr0ste/ecomm-front:latest"
   },
   "dependencies": {
     "next": "15.3.5",
