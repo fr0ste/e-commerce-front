@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { LoginForm as LoginFormType } from '@/types';
 import Input from '@/components/ui/Input';
@@ -11,8 +11,10 @@ import ErrorMessage from '@/components/feedback/ErrorMessage';
 
 export default function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
-  const { login, error, clearError } = useAuth();
+  const { login, error, clearError, isAuthenticated } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get('redirect') || '/';
 
   const {
     register,
@@ -20,13 +22,20 @@ export default function LoginForm() {
     formState: { errors },
   } = useForm<LoginFormType>();
 
+  // Redirigir si ya está autenticado
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push(redirectTo);
+    }
+  }, [isAuthenticated, router, redirectTo]);
+
   const onSubmit = async (data: LoginFormType) => {
     setIsLoading(true);
     clearError();
     
     try {
       await login(data);
-      router.push('/');
+      // La redirección se maneja en el useEffect cuando isAuthenticated cambia
     } catch (err) {
       console.error('Login error:', err);
     } finally {

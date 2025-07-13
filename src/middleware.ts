@@ -10,7 +10,7 @@ export function middleware(request: NextRequest) {
   const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
 
   // Rutas privadas que requieren autenticación
-  const privateRoutes = ['/profile', '/orders', '/checkout'];
+  const privateRoutes = ['/profile', '/orders', '/checkout', '/cart'];
   const isPrivateRoute = privateRoutes.some(route => pathname.startsWith(route));
 
   // Si es una ruta privada y no hay token, redirigir a login

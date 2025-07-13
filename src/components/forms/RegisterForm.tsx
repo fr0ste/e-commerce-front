@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
@@ -11,7 +11,7 @@ import ErrorMessage from '@/components/feedback/ErrorMessage';
 
 export default function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
-  const { register: registerUser, error, clearError } = useAuth();
+  const { register: registerUser, error, clearError, isAuthenticated } = useAuth();
   const router = useRouter();
 
   const {
@@ -23,13 +23,20 @@ export default function RegisterForm() {
 
   const password = watch('password');
 
+  // Redirigir si ya está autenticado
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push('/');
+    }
+  }, [isAuthenticated, router]);
+
   const onSubmit = async (data: RegisterFormType) => {
     setIsLoading(true);
     clearError();
     
     try {
       await registerUser(data);
-      router.push('/');
+      // La redirección se maneja en el useEffect cuando isAuthenticated cambia
     } catch (err) {
       console.error('Register error:', err);
     } finally {
