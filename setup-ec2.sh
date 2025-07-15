@@ -28,7 +28,16 @@ print_error() {
 
 # Update system packages
 print_status "Updating system packages..."
-sudo yum update -y || sudo apt-get update -y
+if command -v yum &> /dev/null; then
+    # Amazon Linux / CentOS / RHEL
+    sudo yum update -y
+elif command -v apt-get &> /dev/null; then
+    # Ubuntu / Debian
+    sudo apt-get update -y
+else
+    print_error "Unsupported package manager"
+    exit 1
+fi
 
 # Install required packages
 print_status "Installing required packages..."
@@ -58,6 +67,12 @@ fi
 # Install Docker Compose
 print_status "Installing Docker Compose..."
 if ! command -v docker-compose &> /dev/null; then
+    # Install Docker Compose v2
+    sudo mkdir -p /usr/local/lib/docker/cli-plugins
+    sudo curl -SL "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/lib/docker/cli-plugins/docker-compose
+    sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+    
+    # Also install as docker-compose for compatibility
     sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
     sudo chmod +x /usr/local/bin/docker-compose
     print_status "Docker Compose installed successfully"
@@ -93,57 +108,17 @@ print_status "Creating application directory..."
 sudo mkdir -p /opt/ecommerce
 sudo chown $USER:$USER /opt/ecommerce
 
-# Clone or copy application files
-print_status "Setting up application files..."
-if [ -d ".git" ]; then
-    # If we're in a git repository, copy the files
-    cp -r . /opt/ecommerce/
-    cp -r ../backend /opt/ecommerce/
-else
-    print_warning "Please copy your application files to /opt/ecommerce/"
-fi
-
 # Create SSL directory
 print_status "Creating SSL directory..."
 sudo mkdir -p /opt/ecommerce/nginx/ssl
 sudo chown $USER:$USER /opt/ecommerce/nginx/ssl
 
-# Set up environment file
-print_status "Setting up environment configuration..."
-if [ -f "env.example" ]; then
-    cp env.example /opt/ecommerce/.env
-    print_warning "Please edit /opt/ecommerce/.env with your production values"
-fi
-
-# Create systemd service for auto-start (optional)
-print_status "Creating systemd service for auto-start..."
-sudo tee /etc/systemd/system/ecommerce.service > /dev/null <<EOF
-[Unit]
-Description=E-commerce Application
-Requires=docker.service
-After=docker.service
-
-[Service]
-Type=oneshot
-RemainAfterExit=yes
-WorkingDirectory=/opt/ecommerce
-ExecStart=/opt/ecommerce/deploy.sh
-ExecStop=/usr/local/bin/docker-compose -f /opt/ecommerce/docker-compose.prod.yml down
-TimeoutStartSec=0
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-# Enable the service
-sudo systemctl enable ecommerce.service
-
 print_status "🎉 EC2 setup completed successfully!"
 print_status "Next steps:"
-echo "  1. Edit /opt/ecommerce/.env with your production values"
-echo "  2. Navigate to /opt/ecommerce directory"
-echo "  3. Run: ./deploy.sh"
-echo "  4. Or start the service: sudo systemctl start ecommerce"
+echo "  1. Copy your application files to /opt/ecommerce/"
+echo "  2. Edit /opt/ecommerce/.env with your production values"
+echo "  3. Navigate to /opt/ecommerce directory"
+echo "  4. Run: ./deploy-hub.sh"
 
 # Show Docker version
 print_status "Docker version:"

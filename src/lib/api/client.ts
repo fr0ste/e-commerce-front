@@ -1,13 +1,13 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import { config } from '@/lib/config';
+import { API_URL } from '@/lib/config';
 
 export const apiClient = axios.create({
-  baseURL: config.api.baseURL,
+  baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: config.api.timeout,
+  timeout: 10000,
 });
 
 // Request interceptor to add auth token
@@ -43,7 +43,7 @@ apiClient.interceptors.response.use(
     // No redirigir automáticamente para evitar loops
     
     // Log error en modo debug
-    if (config.debug) {
+    if (process.env.NODE_ENV === 'development') {
       console.warn('API Error:', {
         url: error.config?.url,
         method: error.config?.method,
