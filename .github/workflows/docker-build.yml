@@ -45,7 +45,7 @@ jobs:
         context: .
         file: ./Dockerfile
         push: true
-        tags: ${{ env.FRONTEND_IMAGE }}:${{ steps.meta.outputs.version }}
+        tags: ${{ env.FRONTEND_IMAGE }}:${{ steps.meta.outputs ${{ env.FRONTEND_IMAGE }}:${{ steps.meta.outputs.version }},${{ env.FRONTEND_IMAGE }}.version }},${:pr-${{ github.event.pull_request.number }},${{ env.FR{ env.FRONTEND_IMAGE }}:latest
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
@@ -54,8 +54,8 @@ jobs:
 
     - name: Push main tag
       run: |
-        docker tag ${{ env.FRONTEND_IMAGE }}:${{ steps.meta.outputs.version }} ${{ env.FRONTEND_IMAGE }}:main
-        docker push ${{ env.FRONTEND_IMAGE }}:main
+        docker tag ${{ env.FRONTEND_IMAGE }}:${{ steps.meta.outputs.version }} ${{ env.FRONTEND_IMAGE }}:latest
+        docker push ${{ env.FRONTEND_IMAGE }}:latest
 
     - name: Test built image
       if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
@@ -76,4 +76,4 @@ jobs:
         echo "🚀 Frontend image pushed successfully!"
         echo "Frontend: ${{ env.FRONTEND_IMAGE }}:${{ steps.meta.outputs.version }}"
         echo "Latest tag also pushed for production deployment."
-        echo "Note: Backend should be deployed separately on its own instance." 
+        echo "Note: Backend should be deployed separately on its own instance."
