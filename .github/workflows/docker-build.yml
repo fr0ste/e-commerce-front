@@ -45,7 +45,7 @@ jobs:
         context: .
         file: ./Dockerfile
         push: true
-        tags: ${{ env.FRONTEND_IMAGE }}:${{ steps.meta.outputs.version }}
+        tags: ${{ env.FRONTEND_IMAGE }}:${{ steps.meta.outputs.version }},${{ env.FRONTEND_IMAGE }}:main
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
@@ -76,4 +76,4 @@ jobs:
         echo "🚀 Frontend image pushed successfully!"
         echo "Frontend: ${{ env.FRONTEND_IMAGE }}:${{ steps.meta.outputs.version }}"
         echo "Latest tag also pushed for production deployment."
-        echo "Note: Backend should be deployed separately on its own instance." 
+        echo "Note: Backend should be deployed separately on its own instance."
