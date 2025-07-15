@@ -53,7 +53,6 @@ jobs:
           BUILDKIT_INLINE_CACHE=1
 
     - name: Push main tag
-      if: github.ref == 'refs/heads/main'
       run: |
         docker tag ${{ env.FRONTEND_IMAGE }}:${{ steps.meta.outputs.version }} ${{ env.FRONTEND_IMAGE }}:main
         docker push ${{ env.FRONTEND_IMAGE }}:main
