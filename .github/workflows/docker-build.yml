@@ -48,6 +48,7 @@ jobs:
         tags: |
           ${{ env.FRONTEND_IMAGE }}:${{ steps.meta.outputs.version }}
           ${{ env.FRONTEND_IMAGE }}:latest
+          ${{ env.FRONTEND_IMAGE }}:main
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
@@ -55,10 +56,8 @@ jobs:
           BUILDKIT_INLINE_CACHE=1
 
     - name: Push main tag
-      run: |
-        docker tag ${{ env.FRONTEND_IMAGE }}:${{ steps.meta.outputs.version }} ${{ env.FRONTEND_IMAGE }}:latest
-        docker push ${{ env.FRONTEND_IMAGE }}:latest
-
+      run: echo "Main tag already applied in build step"
+    
     - name: Test built image
       if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
       run: |
