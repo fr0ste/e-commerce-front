@@ -45,7 +45,9 @@ jobs:
         context: .
         file: ./Dockerfile
         push: true
-        tags: ${{ env.FRONTEND_IMAGE }}:${{ steps.meta.outputs ${{ env.FRONTEND_IMAGE }}:${{ steps.meta.outputs.version }},${{ env.FRONTEND_IMAGE }}.version }},${:pr-${{ github.event.pull_request.number }},${{ env.FR{ env.FRONTEND_IMAGE }}:latest
+        tags: |
+          ${{ env.FRONTEND_IMAGE }}:${{ steps.meta.outputs.version }}
+          ${{ env.FRONTEND_IMAGE }}:latest
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
