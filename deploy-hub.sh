@@ -52,15 +52,15 @@ source .env
 
 # Check backend connectivity
 print_status "Checking backend connectivity..."
-if [ -n "$BACKEND_HOST" ] && [ -n "$BACKEND_PORT" ]; then
-    if curl -f "http://$BACKEND_HOST:$BACKEND_PORT/health" > /dev/null 2>&1; then
-        print_status "✅ Backend is reachable at $BACKEND_HOST:$BACKEND_PORT"
+if [ -n "$BACKEND_HOST" ]; then
+    if curl -f "https://$BACKEND_HOST/health" > /dev/null 2>&1; then
+        print_status "✅ Backend is reachable at $BACKEND_HOST"
     else
-        print_warning "⚠️  Backend health check failed at $BACKEND_HOST:$BACKEND_PORT"
+        print_warning "⚠️  Backend health check failed at $BACKEND_HOST"
         print_warning "Make sure the backend is running and accessible"
     fi
 else
-    print_warning "⚠️  BACKEND_HOST or BACKEND_PORT not configured in .env"
+    print_warning "⚠️  BACKEND_HOST not configured in .env"
 fi
 
 # Stop existing containers
@@ -104,25 +104,15 @@ else
     exit 1
 fi
 
-# Test API connectivity through nginx
-if [ -n "$BACKEND_HOST" ] && [ -n "$BACKEND_PORT" ]; then
-    print_status "Testing API connectivity through nginx..."
-    if curl -f http://localhost:80/api/health > /dev/null 2>&1; then
-        print_status "✅ API proxy is working correctly"
-    else
-        print_warning "⚠️  API proxy test failed - check backend connectivity"
-    fi
-fi
-
 print_status "🎉 Frontend deployment completed successfully!"
 print_status "Application is now running on:"
 echo "  - Frontend: http://localhost:3001"
 echo "  - Nginx Proxy: http://localhost:80"
 if [ -n "$BACKEND_HOST" ]; then
-    echo "  - Backend: http://$BACKEND_HOST:$BACKEND_PORT"
+    echo "  - Backend: $BACKEND_HOST"
 fi
 print_status "Using Docker Hub images:"
-echo "  - Frontend: fr0ste/ecomm-front:${IMAGE_TAG:-latest}"
+echo "  - Frontend: fr0ste/ecomm-front:latest"
 
 # Show running containers
 print_status "Running containers:"

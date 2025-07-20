@@ -131,7 +131,7 @@ export default function RegisterForm() {
           <p className="text-gray-600">
             ¿Ya tienes cuenta?{' '}
             <a href="/auth/login" className="text-primary-600 hover:underline">
-              Inicia sesión aquí
+              Iniciar Sesión
             </a>
           </p>
         </div>

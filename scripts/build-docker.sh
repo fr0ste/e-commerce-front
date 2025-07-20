@@ -1,19 +1,16 @@
 #!/bin/bash
 
-# Build Docker Image Script for E-commerce Frontend
-# This script builds the Docker image with proper error handling
-
+# Script para construir y subir la imagen Docker del frontend
 set -e
 
-echo "🐳 Building Docker image for E-commerce Frontend..."
+echo "🔨 Construyendo imagen Docker del frontend..."
 
-# Colors for output
-RED='\033[0;31m'
+# Colores para output
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
-# Function to print colored output
+# Función para imprimir mensajes
 print_status() {
     echo -e "${GREEN}[INFO]${NC} $1"
 }
@@ -22,82 +19,51 @@ print_warning() {
     echo -e "${YELLOW}[WARNING]${NC} $1"
 }
 
-print_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
-}
-
-# Configuration
-IMAGE_NAME="fr0ste/ecomm-front"
-TAG=${1:-latest}
-DOCKERFILE="Dockerfile"
-
-print_status "Using tag: $TAG"
-
-# Check if Docker is installed
-if ! command -v docker &> /dev/null; then
-    print_error "Docker is not installed. Please install Docker first."
+# Verificar que existe el archivo .env
+if [ ! -f .env ]; then
+    print_warning "Archivo .env no encontrado. Creando desde template..."
+    cp env.example .env
+    print_warning "Por favor edita el archivo .env con tus valores de producción antes de continuar."
     exit 1
 fi
 
-# Check if Dockerfile exists
-if [ ! -f "$DOCKERFILE" ]; then
-    print_error "Dockerfile not found in current directory."
-    exit 1
+# Cargar variables de entorno
+source .env
+
+# Verificar que NEXT_PUBLIC_API_URL esté configurada
+if [ -z "$NEXT_PUBLIC_API_URL" ]; then
+    print_warning "NEXT_PUBLIC_API_URL no está configurada en .env"
+    print_warning "Usando valor por defecto: https://ec2-18-118-129-110.us-east-2.compute.amazonaws.com/"
+    export NEXT_PUBLIC_API_URL="https://ec2-18-118-129-110.us-east-2.compute.amazonaws.com/"
 fi
 
-# Check if package.json exists
-if [ ! -f "package.json" ]; then
-    print_error "package.json not found. Make sure you're in the frontend directory."
-    exit 1
-fi
+print_status "Usando API URL: $NEXT_PUBLIC_API_URL"
 
-# Clean up any existing build artifacts
-print_status "Cleaning up previous build artifacts..."
-rm -rf .next
-rm -rf node_modules/.cache
+# Construir la imagen
+print_status "Construyendo imagen Docker..."
+docker build \
+    --build-arg NEXT_PUBLIC_API_URL="$NEXT_PUBLIC_API_URL" \
+    -t fr0ste/ecomm-front:latest \
+    -t fr0ste/ecomm-front:main \
+    .
 
-# Build the Docker image (compatible with legacy builder)
-print_status "Building Docker image..."
-print_status "Image: $IMAGE_NAME:$TAG"
-
-if docker build \
-    -t "$IMAGE_NAME:$TAG" \
-    -t "$IMAGE_NAME:latest" \
-    -f "$DOCKERFILE" \
-    .; then
+# Verificar que la construcción fue exitosa
+if [ $? -eq 0 ]; then
+    print_status "✅ Imagen construida exitosamente"
     
-    print_status "✅ Docker image built successfully!"
-    print_status "Images created:"
-    echo "  - $IMAGE_NAME:$TAG"
-    echo "  - $IMAGE_NAME:latest"
-    
-    # Show image size
-    print_status "Image size:"
-    docker images "$IMAGE_NAME:$TAG" --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}"
-    
-    # Test the image
-    print_status "Testing image..."
-    if docker run --rm -d --name test-frontend -p 3000:3000 "$IMAGE_NAME:$TAG" > /dev/null 2>&1; then
-        sleep 5
-        if curl -f http://localhost:3000 > /dev/null 2>&1; then
-            print_status "✅ Image test successful!"
-        else
-            print_warning "⚠️  Image test failed - container might not be responding"
-        fi
-        docker stop test-frontend > /dev/null 2>&1 || true
-    else
-        print_warning "⚠️  Could not start test container"
+    # Preguntar si quiere subir la imagen
+    read -p "¿Quieres subir la imagen a Docker Hub? (y/n): " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        print_status "Subiendo imagen a Docker Hub..."
+        docker push fr0ste/ecomm-front:latest
+        docker push fr0ste/ecomm-front:main
+        print_status "✅ Imagen subida exitosamente a Docker Hub"
     fi
-    
 else
-    print_error "❌ Docker build failed!"
-    print_error "Check the build logs above for details."
+    print_warning "❌ Error al construir la imagen"
     exit 1
 fi
 
-print_status "🎉 Build completed successfully!"
-print_status "To run the image locally:"
-echo "  docker run -p 3000:3000 $IMAGE_NAME:$TAG"
-print_status "To push to Docker Hub:"
-echo "  docker push $IMAGE_NAME:$TAG"
-echo "  docker push $IMAGE_NAME:latest" 
+print_status "🎉 Proceso completado!"
+print_status "Imagen disponible como: fr0ste/ecomm-front:latest" 
