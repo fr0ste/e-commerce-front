@@ -1,5 +1,5 @@
 // Configuración centralizada de la aplicación
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
 export const config = {
   // API Configuration

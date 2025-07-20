@@ -56,7 +56,7 @@ export default function LoginForm() {
         <ErrorMessage message={error} />
 
         <Input
-          label="Email"
+          label="Correo electrónico"
           type="email"
           {...register('email', {
             required: 'El email es requerido',
